@@ -8,15 +8,15 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader \
-    && mkdir -p /var/data \
-    && touch /var/data/database.sqlite \
-    && php artisan config:cache \
-    && php artisan route:cache
+RUN composer install --no-dev --optimize-autoloader
 
 EXPOSE 8000
 
-CMD php artisan migrate --force && \
+CMD mkdir -p /var/data && \
+    touch /var/data/database.sqlite && \
+    php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan migrate --force && \
     php artisan db:seed --force && \
     php artisan storage:link && \
     php artisan serve --host=0.0.0.0 --port=8000
