@@ -12,11 +12,11 @@ RUN composer install --no-dev --optimize-autoloader
 
 EXPOSE 8000
 
-CMD mkdir -p /var/data && \
+CMD cp .env.example .env && \
+    php artisan key:generate --force && \
+    mkdir -p /var/data && \
     touch /var/data/database.sqlite && \
-    php artisan config:cache && \
-    php artisan route:cache && \
     php artisan migrate --force && \
-    php artisan db:seed --force && \
-    php artisan storage:link && \
-    php artisan serve --host=0.0.0.0 --port=8000
+    (php artisan db:seed --force || echo "Seeding skipped") && \
+    (php artisan storage:link || echo "Storage link skipped") && \
+    php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
